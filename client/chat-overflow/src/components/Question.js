@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { View, Text, TouchableOpacity, StyleSheet, Modal, TextInput, ScrollView, Alert } from 'react-native';
+import { View, Text, TouchableOpacity, StyleSheet, Modal, TextInput, ScrollView, Alert, KeyboardAvoidingView } from 'react-native';
 import Axios from 'axios';
 import { DeviceWidth, DeviceHeight } from '../../Device/index';
 import IconCommunity from "react-native-vector-icons/MaterialCommunityIcons";
@@ -10,90 +10,94 @@ import Answer from './Answer'
 function Question(props) {
     //console.log(props.deneme)
     const [isLoading, setLoading] = useState(false)
+    const [isLoading2, setLoading2] = useState(false)
     const [answer, setAnswer] = useState('')
-
+    const [a, as] = useState(props.answers)
     return (
-        <TouchableOpacity style={styles.container} onPress={() => {
-            setLoading(true)
-        }}>
-            <Modal transparent={true} animationType={'none'} visible={isLoading}>
-                <View style={styles.modalBackground}>
-                    <View style={styles.detail}>
-                        <View style={styles.head}>
-                            <Text style={[styles.text, { marginBottom: 15, }]}>{props.head}</Text>
-                            <View style={styles.hr}></View>
-                            <Text style={[styles.text, { margin: 10, }]}>{props.text}</Text>
-                            <View style={styles.hr2}></View>
-                            <ScrollView style={styles.scroll}>
-                                {Object.keys(props.answers).map((item, index) => {
-                                    //const answersKeys = Object.keys(props.answers[item])
-                                    //return (
+        <View style={styles.container}>
+            <TouchableOpacity onPress={() => {
+                setLoading(true)
+            }}>
+                <Modal transparent={true} animationType={'none'} visible={isLoading}>
+                    <KeyboardAvoidingView style={styles.modalBackground} behavior='padding' enabled>
+                        <View style={styles.detail}>
+                            <View style={styles.head}>
+                                <Text style={[styles.text, { marginBottom: 15, }]}>{props.head}</Text>
+                                <View style={styles.hr}></View>
+                                <Text style={[styles.text, { margin: 10, }]}>{props.text}</Text>
+                                <View style={styles.hr2}></View>
+                                <ScrollView style={styles.scroll}>
+                                    {Object.keys(props.answers).map((item, index) => {
+                                        //const answersKeys = Object.keys(props.answers[item])
+                                        //return (
 
                                         //answersKeys.map((item2, index2) => {
-                                            //console.log(this.state.questions[item][item2].answers)
-                                            return (
-                                                <Answer key={index} text={props.answers[item].text} />
-                                            )
+                                        //console.log(this.state.questions[item][item2].answers)
+                                        return (
+                                            <Answer key={index} text={props.answers[item].text} />
+                                        )
                                         //}
                                         //))
-                                })}
-                            </ScrollView>
-                        </View>
+                                    })}
+                                </ScrollView>
+                            </View>
 
-                        <View style={styles.close}>
-                            <TextInput
-                                placeholder='  Answer'
-                                placeholderTextColor='#ccc'
-                                autoCapitalize='none'
-                                returnKeyType={'next'}
-                                blurOnSubmit={false}
-                                style={styles.input}
-                                value={answer}
-                                onChangeText={(str) => { setAnswer(str) }}
-                            />
+                            <View style={styles.close}>
+                                <TextInput
+                                    placeholder='  Answer'
+                                    placeholderTextColor='#ccc'
+                                    autoCapitalize='none'
+                                    returnKeyType={'next'}
+                                    blurOnSubmit={false}
+                                    style={styles.input}
+                                    value={answer}
+                                    onChangeText={(str) => { setAnswer(str) }}
+                                />
 
-                            <TouchableOpacity onPress={async () => {
-                                await AppStore.setLoading(true)
+                                <TouchableOpacity onPress={async () => {
+                                    await AppStore.setLoading(true)
 
-                                await Axios.post('http://192.168.43.75:8080/answer/create', {
-                                    'uid': AppStore.uid,
-                                    'ownerUid': props.uid,
-                                    'questionId': props.questionId,
-                                    'answerText': answer,
-                                }).then(response => {
-                                    console.log(response.data)
-                                    if (response.data.status == 200) {
-                                        Alert.alert(response.data.message)
-                                    } else {
-                                        Alert.alert(response.data.message)
-                                    }
-                                })
-                                    .catch((err) => {
-                                        console.log('Erreur : ' + err)
+                                    await Axios.post('http://192.168.43.75:3000/answer/create', {
+                                        'uid': AppStore.uid,
+                                        'ownerUid': props.uid,
+                                        'questionId': props.questionId,
+                                        'answerText': answer,
+                                    }).then(response => {
+                                        console.log(response.data)
+                                        if (response.data.status == 200) {
+                                            Alert.alert(response.data.message)
+                                        } else {
+                                            Alert.alert(response.data.message)
+                                        }
                                     })
-                                await setAnswer('')
-                                await AppStore.setLoading(false)
-                            }}>
-                                <Text style={[styles.text, { color: 'green' }]}>Submit</Text>
-                            </TouchableOpacity>
-                            <TouchableOpacity onPress={() => {
-                                setAnswer('')
-                                setLoading(false)
-                            }}>
-                                <Text style={[styles.text]}>Close</Text>
-                            </TouchableOpacity>
+                                        .catch((err) => {
+                                            console.log('Erreur : ' + err)
+                                        })
+                                    await setAnswer('')
+                                    await AppStore.setQuestion()
+                                    await AppStore.setLoading(false)
+                                }}>
+                                    <Text style={[styles.text, { color: 'green' }]}>Submit</Text>
+                                </TouchableOpacity>
+                                <TouchableOpacity onPress={() => {
+                                    setAnswer('')
+                                    setLoading(false)
+                                }}>
+                                    <Text style={[styles.text]}>Close</Text>
+                                </TouchableOpacity>
 
+                            </View>
                         </View>
-                    </View>
-                </View>
-            </Modal>
-            <IconCommunity
-                name={"comment-question-outline"}
-                color="#1b4e7d"
-                size={35}
-            />
-            <Text style={styles.text}>{props.head}</Text>
-        </TouchableOpacity>
+                    </KeyboardAvoidingView>
+                </Modal>
+                <IconCommunity
+                    name={"comment-question-outline"}
+                    color="#1b4e7d"
+                    size={35}
+                />
+                <Text style={styles.text}>{props.head}</Text>
+            </TouchableOpacity>
+        </View>
     )
 
 }
@@ -192,8 +196,8 @@ const styles = StyleSheet.create({
         borderColor: '#f8f8f8',
         borderWidth: 1,
     },
-    scroll:{
-        height:180,
+    scroll: {
+        height: 180,
     }
 });
 

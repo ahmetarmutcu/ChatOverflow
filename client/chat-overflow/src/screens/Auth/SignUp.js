@@ -36,7 +36,7 @@ export default class SignUp extends React.Component {
 	_signup = async () => {
 		AppStore.setLoading(true)
 
-		await Axios.post('http://192.168.43.75:8080/user/signup', {
+		await Axios.post('http://192.168.43.75:3000/user/signup', {
 			'mail': this.state.email,
 			'password': this.state.password
 		}).then(response => {

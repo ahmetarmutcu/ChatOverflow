@@ -19,7 +19,7 @@ export default class Login extends React.Component {
 		super(props);
 		this.state = {
 			email: 'naim@gmail.com',
-			password: 'naim123',
+			password: '123456',
 		}
 	}
 
@@ -38,7 +38,7 @@ export default class Login extends React.Component {
 	_login = async () => {
 		AppStore.setLoading(true)
 
-		await Axios.post('http://192.168.43.75:8080/user/login', {
+		await Axios.post('http://192.168.43.75:3000/user/login', {
 			'mail': this.state.email,
 			'password': this.state.password
 		}).then(response => {

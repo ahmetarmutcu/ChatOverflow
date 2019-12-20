@@ -2,7 +2,10 @@ const express = require('express')
 const { admin, firebase, db } = require('./config')
 
 const app = express()
-const port = 8080
+const http = require('http').createServer(app)
+const io = require('socket.io')(http);
+const port = 3000
+//const tcpPort = 3000
 
 app.use(express.json());
 
@@ -25,6 +28,10 @@ app.post('/user/signup', async (req, res) => {
         "message": "The user is created succesfully",
         "uid": userRecord.uid
       }
+      const ref = db.ref('users/' + userRecord.uid + '/');
+      ref.set({
+        'mail': req.body.mail
+      })
       res.send(JSONData)
     })
     .catch(function (error) {
@@ -125,4 +132,29 @@ app.get('/question/questions', async (req, res) => {
   res.end()
 })
 
-app.listen(port, () => console.log(`Example app listening on port ${port}!`))
+app.get('/user/get', async (req, res) => {
+  const ref = db.ref('users/')
+  await ref.once("value", async (snap) => {
+    const JSONData = {
+      'status': 200,
+      'message': 'The users arrived succesfully',
+      'data': snap.val()
+    }
+    res.send(JSONData)
+  })
+
+  res.end()
+})
+
+
+http.listen(port, () => console.log(`Example app listening on port ${port}!`))
+
+io.on('connection', function (socket) {
+  console.log('a user connected');
+  socket.on('message', data => {
+    console.log(data)
+    socket.emit('message', data)
+  })
+});
+
+
