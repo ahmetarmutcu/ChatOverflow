@@ -11,10 +11,9 @@ export default class PrivateChat extends Component {
       users: []
     };
   }
-  componentDidMount = async () => {
+  _fetch = async() => {
     AppStore.setLoading(true)
-
-    await Axios.get('http://192.168.43.75:3000/user/get').then(async (response) => {
+    await Axios.get('https://chatsauuu.herokuapp.com/user/get').then(async (response) => {
       //console.log(response.data)
       if (response.data.status == 200) {
         console.log(response.data.data)
@@ -29,6 +28,14 @@ export default class PrivateChat extends Component {
       .catch((err) => {
         console.log('Erreur : ' + err)
       })
+    AppStore.setLoading(false)
+  }
+  componentDidMount = async () => {
+    AppStore.setLoading(true)
+    AppStore.io.on('signup', async (data) => {
+      this._fetch()
+    })
+    await this._fetch()
 
     AppStore.setLoading(false)
   }
@@ -39,7 +46,7 @@ export default class PrivateChat extends Component {
           {
             Object.keys(this.state.users).map((item, index) => {
               return (
-                <User key={index} uid={item} mail={this.state.users[item].mail}/>
+                <User key={index} uid={item} mail={this.state.users[item].mail} />
               )
             })
           }

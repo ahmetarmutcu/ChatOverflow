@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { View, Text, TouchableOpacity, StyleSheet, Modal, TextInput, ScrollView, Alert, KeyboardAvoidingView } from 'react-native';
 import Axios from 'axios';
 import { DeviceWidth, DeviceHeight } from '../../Device/index';
@@ -13,6 +13,15 @@ function Question(props) {
     const [isLoading2, setLoading2] = useState(false)
     const [answer, setAnswer] = useState('')
     const [a, as] = useState(props.answers)
+
+    useEffect(() => {
+        AppStore.io.on('answer', (mess) => {
+            AppStore.setLoading(true)
+            AppStore.setQuestion()
+            AppStore.setLoading(false)
+        })
+    }, []);
+
     return (
         <View style={styles.container}>
             <TouchableOpacity onPress={() => {
@@ -57,14 +66,16 @@ function Question(props) {
                                 <TouchableOpacity onPress={async () => {
                                     await AppStore.setLoading(true)
 
-                                    await Axios.post('http://192.168.43.75:3000/answer/create', {
+                                    await Axios.post('https://chatsauuu.herokuapp.com/answer/create', {
                                         'uid': AppStore.uid,
                                         'ownerUid': props.uid,
                                         'questionId': props.questionId,
                                         'answerText': answer,
-                                    }).then(response => {
+                                    }).then(async (response) => {
                                         console.log(response.data)
                                         if (response.data.status == 200) {
+                                            const data = "yeni cevap olusturuldu."
+                                            await AppStore.io.emit('answer', (data));
                                             Alert.alert(response.data.message)
                                         } else {
                                             Alert.alert(response.data.message)

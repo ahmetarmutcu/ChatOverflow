@@ -7,7 +7,7 @@ class AppStore {
     constructor() {
         this.loading = false;
         this.uid = ''
-        this.io = socketIO.connect('http://192.168.43.75:3000', {
+        this.io = socketIO.connect('https://chatsauuu.herokuapp.com', {
             timeout: 10000,
         });
         this.questions=[]
@@ -27,7 +27,7 @@ class AppStore {
         this.uid = id
     }
     @action setQuestion = () => {
-        Axios.get('http://192.168.43.75:3000/question/questions').then(async (response) => {
+        Axios.get('https://chatsauuu.herokuapp.com/question/questions').then(async (response) => {
             //console.log(response.data)
             if (response.data.status == 200) {
                 //console.log(response.data.data[0])

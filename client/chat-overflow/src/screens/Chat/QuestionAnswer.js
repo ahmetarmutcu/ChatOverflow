@@ -16,12 +16,11 @@ export default class QuestionAnswer extends Component {
       text: '',
     }
   }
-
   componentDidMount = async () => {
     AppStore.setLoading(true)
-
-
-
+    await AppStore.io.on('question', async (data) => {
+      AppStore.setQuestion()
+    })
     await AppStore.setLoading(false)
   }
 
@@ -64,13 +63,15 @@ export default class QuestionAnswer extends Component {
                   <TouchableOpacity onPress={async () => {
                     await AppStore.setLoading(true)
 
-                    await Axios.post('http://192.168.43.75:3000/question/create', {
+                    await Axios.post('https://chatsauuu.herokuapp.com/question/create', {
                       'uid': AppStore.uid,
                       'questionHeader': this.state.head,
                       'questionText': this.state.text,
-                    }).then(response => {
+                    }).then(async (response) => {
                       console.log(response.data)
                       if (response.data.status == 200) {
+                        const data = "yeni soru olusturuldu."
+                        await AppStore.io.emit('question', (data));
                         Alert.alert(response.data.message)
                       } else {
                         Alert.alert(response.data.message)
@@ -84,7 +85,7 @@ export default class QuestionAnswer extends Component {
                     await this.setState({
                       loading: false
                     })
-                    await AppStore.setQuestion()
+
                   }}>
                     <Text style={[styles.text, { color: 'green' }]}>Submit</Text>
                   </TouchableOpacity>

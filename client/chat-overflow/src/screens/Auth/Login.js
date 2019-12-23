@@ -38,7 +38,7 @@ export default class Login extends React.Component {
 	_login = async () => {
 		AppStore.setLoading(true)
 
-		await Axios.post('http://192.168.43.75:3000/user/login', {
+		await Axios.post('https://chatsauuu.herokuapp.com/user/login', {
 			'mail': this.state.email,
 			'password': this.state.password
 		}).then(response => {

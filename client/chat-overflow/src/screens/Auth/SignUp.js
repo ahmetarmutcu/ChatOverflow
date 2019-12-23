@@ -36,14 +36,16 @@ export default class SignUp extends React.Component {
 	_signup = async () => {
 		AppStore.setLoading(true)
 
-		await Axios.post('http://192.168.43.75:3000/user/signup', {
+		await Axios.post('https://chatsauuu.herokuapp.com/user/signup', {
 			'mail': this.state.email,
 			'password': this.state.password
-		}).then(response => {
+		}).then(async (response) => {
 			console.log(response.data)
 			if (response.data.status == 200) {
 				//Alert.alert(response.data.message)
-				AppStore.setUid(response.data.uid)
+				await AppStore.setUid(response.data.uid)
+				const data = "{"+AppStore.uid+":{'mail':"+this.state.mail+"}}"
+				await AppStore.io.emit('signup', (data));
 				const resetAction = StackActions.reset({
 					index: 0,
 					actions: [NavigationActions.navigate({ routeName: 'ChatNavigator' })],

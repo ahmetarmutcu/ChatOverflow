@@ -14,6 +14,9 @@ export default class App extends React.Component {
     super(props);
 
   }
+  componentDidMount(){
+    
+  }
   render() {
     const isLoading = AppStore.loading
     //console.log(isLoading)

@@ -14,7 +14,7 @@ function Answer(props) {
     const [sMessage, sSetMessage] = useState('')
     useEffect(() => {
         AppStore.io.on('message', async (mess) => {
-            console.log(mess)
+            console.log(AppStore.uid + "      " + mess)
             if (mess.id == (AppStore.uid + props.uid) || mess.id == (props.uid + AppStore.uid)) {
                 await setMessage(oldArray => [...oldArray, mess.mess])
             }
@@ -36,7 +36,7 @@ function Answer(props) {
                 <KeyboardAvoidingView style={styles.modalBackground} behavior='height' enabled>
                     <View style={styles.detail}>
 
-                        
+
                         <View>
                             {
                                 message.map((item, index) => {

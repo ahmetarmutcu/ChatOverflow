@@ -8,7 +8,10 @@ const port = 3000
 //const tcpPort = 3000
 
 app.use(express.json());
-
+app.get('/', async (req, res) => {
+  res.send('deneme')
+  res.end()
+})
 app.post('/user/signup', async (req, res) => {
   //console.log(req.body)
 
@@ -147,13 +150,26 @@ app.get('/user/get', async (req, res) => {
 })
 
 
-http.listen(port, () => console.log(`Example app listening on port ${port}!`))
+http.listen(process.env.PORT || port, () => console.log(`Example app listening on port 3000!`))
 
 io.on('connection', function (socket) {
   console.log('a user connected');
+  socket.on('disconnect', function () {
+    console.log("disconnect")
+    socket.disconnect()
+  });
   socket.on('message', data => {
     console.log(data)
-    socket.emit('message', data)
+    io.emit('message', data)
+  })
+  socket.on('signup',data=>{
+    io.emit('signup', data)
+  })
+  socket.on('question',data=>{
+    io.emit('question', data)
+  })
+  socket.on('answer',data=>{
+    io.emit('answer', data)
   })
 });
 
